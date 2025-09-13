@@ -37,7 +37,7 @@ def create_base_table(conn):
     """)
     conn.commit()
     cur.close()
-    print("✓ Base table created")
+    print("Base table created")
 
 def generate_viewing_events(conn, num_days=30, events_per_day=100000):
     """ Generate realistic viewing data with skews and batch inserts.
@@ -87,8 +87,8 @@ def generate_viewing_events(conn, num_days=30, events_per_day=100000):
     start_date = (datetime.now(timezone.utc) - timedelta(days=num_days)).date()
 
     def synth_row(ts):
-        uid = random.choice(user_ids)
-        cid = random.choice(content_ids)
+        uid = int(random.choice(user_ids))
+        cid = int(random.choice(content_ids))
         et  = random.choices(event_types, event_wts, k=1)[0]
         dev = random.choices(devices, device_wts, k=1)[0]
         cc  = random.choices(countries, country_wts, k=1)[0]
@@ -117,7 +117,7 @@ def generate_viewing_events(conn, num_days=30, events_per_day=100000):
         return (uid, cid, ts, et, dur, dev, cc, q, bw)
 
     total_rows = num_days * events_per_day
-    print(f"→ Generating {total_rows:,} events over {num_days} days…")
+    print(f"Generating {total_rows:,} events over {num_days} days…")
 
     for d in range(num_days):
         day = start_date + timedelta(days=d)
@@ -152,10 +152,10 @@ def generate_viewing_events(conn, num_days=30, events_per_day=100000):
             produced += this_batch
 
         conn.commit()
-        print(f"  ✓ Day {d+1}/{num_days} inserted ({events_per_day:,} rows)")
+        print(f"   Day {d+1}/{num_days} inserted ({events_per_day:,} rows)")
 
     cur.close()
-    print("✓ Data generation complete")
+    print("Data generation complete")
 
 def analyze_current_performance(conn):
     """
