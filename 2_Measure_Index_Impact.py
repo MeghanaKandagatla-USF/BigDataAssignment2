@@ -1,5 +1,6 @@
 import psycopg2
 import time
+import sys
 
 def connect_db():
     """Connects to the PostgreSQL database."""
@@ -59,15 +60,15 @@ def measure_index_performance(conn):
             print(f"  '{name}' query took: {duration:.2f} ms")
 
         # Step 2: Create your indexes
-        print("\n--- Creating indexes from Task2_1.sql ---")
+        print("\n--- Creating indexes from 2_index_strategy.sql ---")
         try:
-            with open('Task2_1.sql', 'r') as f:
+            with open('2_index_strategy.sql', 'r') as f:
                 sql_script = f.read()
                 cur.execute(sql_script)
             conn.commit()
             print("Indexes created successfully.")
         except FileNotFoundError:
-            print("ERROR: 'Task2_1.sql' not found. Please create it in the same directory.")
+            print("ERROR: '2_index_strategy.sql' not found. Please create it in the same directory.")
             return None
 
 
@@ -96,12 +97,22 @@ def measure_index_performance(conn):
     return results
 
 if __name__ == '__main__':
-    conn = None
-    try:
-        conn = connect_db()
-        measure_index_performance(conn)
-    except psycopg2.Error as e:
-        print(f"Database error: {e}")
-    finally:
-        if conn:
-            conn.close()
+
+    output_filename = '2_index_performance_report.txt'
+    original_stdout = sys.stdout
+
+    with open(output_filename, 'w') as f:
+        sys.stdout = f  
+
+        conn = None
+        try:
+            conn = connect_db()
+            measure_index_performance(conn)
+        except psycopg2.Error as e:
+            print(f"Database error: {e}")
+        finally:
+            if conn:
+                conn.close()
+
+    sys.stdout = original_stdout  
+    print(f"Script finished. Output saved to '{output_filename}'")

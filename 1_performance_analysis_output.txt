@@ -1,0 +1,119 @@
+Connecting to database...
+Base table created
+Generating 500,000 events over 50 days…
+   Day 1/50 inserted (10,000 rows)
+   Day 2/50 inserted (10,000 rows)
+   Day 3/50 inserted (10,000 rows)
+   Day 4/50 inserted (10,000 rows)
+   Day 5/50 inserted (10,000 rows)
+   Day 6/50 inserted (10,000 rows)
+   Day 7/50 inserted (10,000 rows)
+   Day 8/50 inserted (10,000 rows)
+   Day 9/50 inserted (10,000 rows)
+   Day 10/50 inserted (10,000 rows)
+   Day 11/50 inserted (10,000 rows)
+   Day 12/50 inserted (10,000 rows)
+   Day 13/50 inserted (10,000 rows)
+   Day 14/50 inserted (10,000 rows)
+   Day 15/50 inserted (10,000 rows)
+   Day 16/50 inserted (10,000 rows)
+   Day 17/50 inserted (10,000 rows)
+   Day 18/50 inserted (10,000 rows)
+   Day 19/50 inserted (10,000 rows)
+   Day 20/50 inserted (10,000 rows)
+   Day 21/50 inserted (10,000 rows)
+   Day 22/50 inserted (10,000 rows)
+   Day 23/50 inserted (10,000 rows)
+   Day 24/50 inserted (10,000 rows)
+   Day 25/50 inserted (10,000 rows)
+   Day 26/50 inserted (10,000 rows)
+   Day 27/50 inserted (10,000 rows)
+   Day 28/50 inserted (10,000 rows)
+   Day 29/50 inserted (10,000 rows)
+   Day 30/50 inserted (10,000 rows)
+   Day 31/50 inserted (10,000 rows)
+   Day 32/50 inserted (10,000 rows)
+   Day 33/50 inserted (10,000 rows)
+   Day 34/50 inserted (10,000 rows)
+   Day 35/50 inserted (10,000 rows)
+   Day 36/50 inserted (10,000 rows)
+   Day 37/50 inserted (10,000 rows)
+   Day 38/50 inserted (10,000 rows)
+   Day 39/50 inserted (10,000 rows)
+   Day 40/50 inserted (10,000 rows)
+   Day 41/50 inserted (10,000 rows)
+   Day 42/50 inserted (10,000 rows)
+   Day 43/50 inserted (10,000 rows)
+   Day 44/50 inserted (10,000 rows)
+   Day 45/50 inserted (10,000 rows)
+   Day 46/50 inserted (10,000 rows)
+   Day 47/50 inserted (10,000 rows)
+   Day 48/50 inserted (10,000 rows)
+   Day 49/50 inserted (10,000 rows)
+   Day 50/50 inserted (10,000 rows)
+Data generation complete
+
+==== daily_active_users_7d ====
+GroupAggregate  (cost=10357.19..10363.89 rows=50 width=16) (actual time=91.157..118.788 rows=7 loops=1)
+  Group Key: (date_trunc('day'::text, event_timestamp))
+  ->  Gather Merge  (cost=10357.19..10363.01 rows=50 width=12) (actual time=88.479..112.336 rows=66331 loops=1)
+        Workers Planned: 2
+        Workers Launched: 2
+        ->  Sort  (cost=9357.16..9357.22 rows=21 width=12) (actual time=70.213..73.358 rows=22110 loops=3)
+              Sort Key: (date_trunc('day'::text, event_timestamp)), user_id
+              Sort Method: quicksort  Memory: 1407kB
+              Worker 0:  Sort Method: quicksort  Memory: 1408kB
+              Worker 1:  Sort Method: quicksort  Memory: 1564kB
+              ->  Parallel Seq Scan on viewing_events  (cost=0.00..9356.70 rows=21 width=12) (actual time=46.891..61.878 rows=22110 loops=3)
+                    Filter: (event_timestamp >= (now() - '7 days'::interval))
+                    Rows Removed by Filter: 144556
+Planning Time: 2.134 ms
+Execution Time: 118.882 ms
+
+==== top10_content_24h ====
+Limit  (cost=10880.30..10880.33 rows=10 width=12) (actual time=66.123..73.667 rows=10 loops=1)
+  ->  Sort  (cost=10880.30..10880.35 rows=20 width=12) (actual time=66.120..73.660 rows=10 loops=1)
+        Sort Key: (count(*)) DESC
+        Sort Method: top-N heapsort  Memory: 25kB
+        ->  Finalize GroupAggregate  (cost=10877.60..10879.87 rows=20 width=12) (actual time=65.506..73.545 rows=544 loops=1)
+              Group Key: content_id
+              ->  Gather Merge  (cost=10877.60..10879.59 rows=16 width=12) (actual time=65.479..73.348 rows=728 loops=1)
+                    Workers Planned: 2
+                    Workers Launched: 2
+                    ->  Partial GroupAggregate  (cost=9877.58..9877.72 rows=8 width=12) (actual time=28.151..28.329 rows=243 loops=3)
+                          Group Key: content_id
+                          ->  Sort  (cost=9877.58..9877.60 rows=8 width=4) (actual time=28.109..28.162 rows=845 loops=3)
+                                Sort Key: content_id
+                                Sort Method: quicksort  Memory: 49kB
+                                Worker 0:  Sort Method: quicksort  Memory: 25kB
+                                Worker 1:  Sort Method: quicksort  Memory: 25kB
+                                ->  Parallel Seq Scan on viewing_events  (cost=0.00..9877.46 rows=8 width=4) (actual time=27.317..27.898 rows=845 loops=3)
+                                      Filter: (((event_type)::text = 'start'::text) AND (event_timestamp >= (now() - '24:00:00'::interval)))
+                                      Rows Removed by Filter: 165822
+Planning Time: 0.296 ms
+Execution Time: 73.747 ms
+
+==== device_analytics_prev_month ====
+Sort  (cost=11688.19..11688.20 rows=4 width=13) (actual time=124.606..131.987 rows=4 loops=1)
+  Sort Key: (count(*)) DESC
+  Sort Method: quicksort  Memory: 25kB
+  ->  Finalize GroupAggregate  (cost=11687.13..11688.15 rows=4 width=13) (actual time=124.590..131.978 rows=4 loops=1)
+        Group Key: device_type
+        ->  Gather Merge  (cost=11687.13..11688.07 rows=8 width=13) (actual time=124.557..131.941 rows=12 loops=1)
+              Workers Planned: 2
+              Workers Launched: 2
+              ->  Sort  (cost=10687.11..10687.12 rows=4 width=13) (actual time=118.183..118.185 rows=4 loops=3)
+                    Sort Key: device_type
+                    Sort Method: quicksort  Memory: 25kB
+                    Worker 0:  Sort Method: quicksort  Memory: 25kB
+                    Worker 1:  Sort Method: quicksort  Memory: 25kB
+                    ->  Partial HashAggregate  (cost=10687.03..10687.07 rows=4 width=13) (actual time=118.094..118.097 rows=4 loops=3)
+                          Group Key: device_type
+                          Batches: 1  Memory Usage: 24kB
+                          Worker 0:  Batches: 1  Memory Usage: 24kB
+                          Worker 1:  Batches: 1  Memory Usage: 24kB
+                          ->  Parallel Seq Scan on viewing_events  (cost=0.00..9877.46 rows=161914 width=5) (actual time=11.404..84.846 rows=143333 loops=3)
+                                Filter: (event_timestamp >= (date_trunc('month'::text, now()) - '1 mon'::interval))
+                                Rows Removed by Filter: 23333
+Planning Time: 0.203 ms
+Execution Time: 132.053 ms

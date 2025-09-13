@@ -1,0 +1,24 @@
+This script will create partitions and migrate data.
+
+--- Creating 3 monthly partitions starting from 2025-07-01 ---
+Partition creation process complete.
+
+--- Migrating data to partitioned table ---
+  Clearing destination table...
+  Migrated 50000/500000 rows (10.00%)
+  Migrated 100000/500000 rows (20.00%)
+  Migrated 150000/500000 rows (30.00%)
+  Migrated 200000/500000 rows (40.00%)
+  Migrated 250000/500000 rows (50.00%)
+  Migrated 300000/500000 rows (60.00%)
+  Migrated 350000/500000 rows (70.00%)
+  Migrated 400000/500000 rows (80.00%)
+  Migrated 450000/500000 rows (90.00%)
+  Migrated 500000/500000 rows (100.00%)
+
+Data integrity check: Monolithic count = 500000, Partitioned count = 500000
+Verification successful: Row counts match.
+
+Database connection closed.
+
+Partitioning and migration complete.

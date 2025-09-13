@@ -1,0 +1,36 @@
+
+==================================================
+      StreamFlix Performance Optimization Report
+==================================================
+
+## 1. Executive Summary
+Indexing plus time-based partitioning improves key analytics query latency and scales with data growth. Partition pruning reduces scanned data, while per-partition maintenance and archival keep operational overhead low.
+
+## 2. Query Performance (Indexed vs. Partitioned)
+  - daily_active_users:
+    - Indexed: 11.15 ms
+    - Partitioned: 12.17 ms
+    - Improvement: -9.22%
+  - top_10_content:
+    - Indexed: 1.69 ms
+    - Partitioned: 1.58 ms
+    - Improvement: 6.24%
+
+## 3. Storage Impact Analysis
+  - Monolithic Table Size: 109 MB
+  - Index Size (Monolithic): 65 MB
+  - Partitioned Table Size: 110 MB
+  - Partitioned Index Size: 66 MB
+
+## 4. Maintenance Benefits
+  - VACUUM/ANALYZE: Run on smaller partitions to reduce maintenance windows and enable parallelism.
+  - Data Archival: Drop old partitions instantly instead of slow bulk DELETE operations.
+
+## 5. Recommendations
+  - Deploy targeted btree indexes: (event_timestamp), (event_type, event_timestamp), (content_id, event_timestamp), (user_id, event_timestamp).
+  - Add a BRIN index on event_timestamp for large range scans.
+  - Use monthly/daily partitions on event_timestamp; ensure queries include a time predicate.
+  - Track table and index sizes for the partitioned design; tune autovacuum on hot partitions.
+  - Consider declarative partitioning if you’re on inheritance and PG version supports it.
+
+==================================================

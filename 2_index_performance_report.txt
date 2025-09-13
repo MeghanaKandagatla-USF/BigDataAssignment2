@@ -1,0 +1,19 @@
+Connecting to database...
+
+--- Measuring performance BEFORE indexes ---
+  'daily_active_users' query took: 134.45 ms
+  'top_10_content' query took: 34.40 ms
+  'device_analytics' query took: 67.98 ms
+
+--- Creating indexes from 2_index_strategy.sql ---
+Indexes created successfully.
+
+--- Measuring performance AFTER indexes ---
+  'daily_active_users' query took: 31.80 ms
+  'top_10_content' query took: 2.43 ms
+  'device_analytics' query took: 73.07 ms
+
+--- Performance Improvement Report ---
+  daily_active_users: 134.45ms -> 31.80ms (76.35% improvement, 4.2x faster)
+  top_10_content: 34.40ms -> 2.43ms (92.95% improvement, 14.2x faster)
+  device_analytics: 67.98ms -> 73.07ms (-7.49% improvement, 0.9x faster)

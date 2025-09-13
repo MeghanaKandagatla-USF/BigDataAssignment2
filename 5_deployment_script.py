@@ -45,14 +45,14 @@ def deploy_optimizations(conn, dry_run=True):
             # Run the hybrid strategy script
             logging.info("  - Creating hybrid partitioned table and supporting objects...")
             try:
-                with open('Task5_1.sql', 'r') as f:
+                with open('5_optimisation_strategy.sql', 'r') as f:
                     hybrid_script = f.read()
-                    logging.info("    - EXECUTING: Task5_1.sql")
+                    logging.info("    - EXECUTING: 5_optimisation_strategy.sql")
                     if not dry_run:
                         cur.execute(hybrid_script)
                         conn.commit()
             except FileNotFoundError:
-                logging.error("  - 'Task5_1.sql' not found. Aborting.")
+                logging.error("  - '5_optimisation_strategy.sql' not found. Aborting.")
                 return {'status': 'failed', 'reason': 'Missing SQL script'}
                 
             # 4. Verify each step before proceeding
@@ -96,8 +96,8 @@ if __name__ == '__main__':
         deploy_optimizations(conn, dry_run=True)
     
         # To actually apply the changes, you would uncomment the following lines:
-        # print("\n--- Running deployment script in EXECUTE mode ---")
-        # deploy_optimizations(conn, dry_run=False)
+        print("\n--- Running deployment script in EXECUTE mode ---")
+        deploy_optimizations(conn, dry_run=False)
     
     except psycopg2.Error as e:
         print(f"Database connection error: {e}")

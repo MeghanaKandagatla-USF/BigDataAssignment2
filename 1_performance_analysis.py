@@ -4,6 +4,7 @@ import numpy as np
 from datetime import datetime, timedelta, timezone
 import random
 import time
+import sys
 
 def connect_db():
     """Connect to PostgreSQL database."""
@@ -39,7 +40,7 @@ def create_base_table(conn):
     cur.close()
     print("Base table created")
 
-def generate_viewing_events(conn, num_days=30, events_per_day=100000):
+def generate_viewing_events(conn, num_days=365, events_per_day=10000):
     """ Generate realistic viewing data with skews and batch inserts.
         - Peak hours 7–10 PM
         - 100k users (power-law)
@@ -207,10 +208,19 @@ def analyze_current_performance(conn):
     return results
 
 if __name__ == "__main__":
-    conn = connect_db()
-    create_base_table(conn)
-    generate_viewing_events(conn, num_days=3, events_per_day=50_000)  # try small first
-    plans = analyze_current_performance(conn)
-    for k, v in plans.items():
-        print("\n====", k, "====\n", v)
-    conn.close()
+    output_filename = '1_performance_analysis_output.txt'
+    original_stdout = sys.stdout 
+
+    with open(output_filename, 'w') as f:
+        sys.stdout = f  
+
+        conn = connect_db()
+        create_base_table(conn)
+        generate_viewing_events(conn, num_days=50, events_per_day=10000)
+        plans = analyze_current_performance(conn)
+        for k, v in plans.items():
+            print(f"\n==== {k} ====\n{v}")
+        conn.close()
+
+    sys.stdout = original_stdout 
+    print(f"Script finished. Output saved to '{output_filename}'")
